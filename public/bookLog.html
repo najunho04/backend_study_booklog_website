@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookLog - 새로운 독서 기록장</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        html {
+            scroll-behavior: smooth; /* 스크롤이 부드럽게 스르륵 이동하게 만듭니다 */
+        }
+
+        /* [1] 초기화 및 기본 스타일 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', 'Noto Sans KR', sans-serif;
+            overflow-x: hidden;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* [2] 배경 그라디언트 (Hero Section) */
+        .hero-section {
+            width: 100%;
+            min-height: 100vh; /* 화면 꽉 차게 */
+            background: linear-gradient(135deg, #CBBBA0 0%, #F3EFEA 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* [3] 네비게이션 바 */
+        header {
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .logo-img {
+            height: 40px;        /* 로고의 높이를 텍스트 크기에 맞춰 조절 */
+            width: auto;         /* 가로 길이는 비율에 맞게 자동 조절 */
+            object-fit: contain; /* 이미지가 찌그러지지 않게 방지 */
+            border-radius: 50px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-menu li a {
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .nav-menu li a:hover { opacity: 1; }
+
+        /* [4] 버튼 스타일 (로그인/로그아웃) */
+        .btn-white-pill {
+            background-color: white;
+            color: #CBBBA0;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-white-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.6);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        /* [5] 메인 컨텐츠 영역 */
+        .content-wrapper {
+            text-align: center;
+            margin-top: 80px;
+            /* 검은 배경보다 뒤로 가야 하므로 낮은 z-index */
+            z-index: 1;
+            margin-bottom: -150px;
+        }
+
+        .sub-title {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .main-title {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        /* 스마트폰 이미지 영역 (목업 대체) */
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background-color: #f8f9fa; /* 밝은 회색으로 변경 (이미지 느낌) */
+            border-radius: 40px;
+            border: 12px solid #222; /* 베젤 두께감 조절 */
+            margin: 50px auto 0; /* 중앙 정렬 */
+            margin-left: 50px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            background-image: url('book_log_login_screen.png');
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+        }
+        
+        /* 유저 정보 표시 영역 (커스텀 추가) */
+        .user-info-display {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-right: 10px;
+        }
+
+        /* [6] 하단 About 섹션 (기존) */
+        .about-section {
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding: 150px 20px 100px 20px; /* 상단 패딩 늘림 */
+            position: relative; 
+            z-index: 10; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+        .about-label {
+            color: #CBBBA0;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .about-text {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        /* =========================================================
+           [7] 새로운 서비스 섹션 (스크린샷 기반 디자인 추가) 
+           ========================================================= */
+        .service-container {
+            background-color: black; /* 전체 검은 배경 */
+            color: white;
+            padding: 100px 20px;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* 상단 헤더 (북로그 타이틀) */
+        .svc-header {
+            text-align: center;
+            margin-bottom: 120px;
+        }
+        .svc-header-label {
+            color: #CBBBA0;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: block;
+            font-size: 16px;
+        }
+        .svc-header-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        /* 컨텐츠 로우 (텍스트 + 이미지) */
+        .feature-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto 150px auto; /* 섹션 간 간격 */
+            gap: 50px;
+        }
+
+        /* 짝수 번째 로우는 이미지와 텍스트 위치 반전 (지그재그 효과) */
+        .feature-row.reverse {
+            flex-direction: row-reverse;
+        }
+
+        /* 텍스트 영역 스타일 */
+        .feature-text {
+            flex: 1;
+            text-align: left;
+        }
+        .feature-label {
+            color: #CBBBA0;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .feature-title {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .feature-desc {
+            color: #888; /* 회색 설명 텍스트 */
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* 이미지(카드) 영역 스타일 */
+        .feature-card {
+            flex: 1;
+            height: 400px;
+            background-color: #1c1c1e; /* 짙은 회색 배경 (스크린샷 카드 느낌) */
+            border-radius: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-img {
+            width: 100%;       /* 카드의 너비에 맞춤 */
+            height: 100%;      /* 카드의 높이에 맞춤 */
+            object-fit: contain; /* 이미지가 비율을 유지하며 카드 영역을 꽉 채우도록 함 (Crop 효과) */
+            border-radius: 30px; /* 부모인 feature-card의 곡률과 맞춤 */
+        }
+        
+        /* 반응형: 모바일에서는 세로로 정렬 */
+        @media (max-width: 768px) {
+            .feature-row, .feature-row.reverse {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+                margin-bottom: 80px;
+            }
+            .feature-text {
+                text-align: center; /* 모바일은 중앙 정렬 */
+            }
+            .main-title { font-size: 40px; }
+            .svc-header-title { font-size: 32px; }
+            .feature-title { font-size: 28px; }
+            .feature-card { width: 100%; height: 300px; }
+        }
+
+        /* [8] 애니메이션 스타일 */
+        .reveal {
+            opacity: 0;
+            transform: translateX(-50px); /* 왼쪽으로 50px 이동된 상태 */
+            transition: all 0.8s ease-out; /* 0.8초 동안 부드럽게 재생 */
+        }
+
+        /* 스크롤 감지 시 붙여줄 클래스 */
+        .reveal.active {
+            opacity: 1;
+            transform: translateX(0); /* 제자리로 복귀 */
+        }
+
+        /* 요소별 순차적 등장을 위한 지연 시간 (선택 사항) */
+        .feature-row:nth-child(2) { transition-delay: 0.2s; }
+        .feature-row:nth-child(3) { transition-delay: 0.4s; }
+        .feature-row:nth-child(4) { transition-delay: 0.6s; }
+
+    </style>
+</head>
+<body>
+
+    <section class="hero-section">
+        <header>
+            <div class="logo">
+                <img src="app_icon_back_white.png" alt="BookLog Logo" class="logo-img">
+                BookLog
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href='/bookLog.html'>메인</a></li>
+                    <li><a href="#about">서비스</a></li>
+                    <li><a href='/download.html'>다운로드</a></li>
+                    
+                    <li id="auth-area" style="display: flex; align-items: center;">
+                        <span id="display_msg" class="user-info-display" style="display:none;"></span>
+                        
+                        <button id="btn_login" class="btn-white-pill" onclick="location.href='/login.html'">
+                            로그인 / 앱 다운로드
+                        </button>
+                        
+                        <button id="btn_logout" class="btn-white-pill" style="display: none;" onclick="logout()">
+                            로그아웃
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="content-wrapper">
+            <p class="sub-title">기록과 복기, 북로그</p>
+            <h1 class="main-title">
+                BookLog<br>
+                Record and Remind Your Book
+            </h1>
+            
+            <p id="user_details" style="font-size: 14px; opacity: 0.8; margin-bottom: 20px; min-height: 20px;"></p>
+
+            <button class="btn-outline" onclick="location.href='/main.html'">앱 다운로드 바로가기</button>
+
+            <div class="phone-mockup">
+                <div style="text-align: center;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <span class="about-label">About</span>
+        <h2 class="about-text">
+            독서에서 멈추지 마세요.<br>
+            그 날의 독서를 기록하고<br>
+            훗날 꺼내보며 추억해보세요.
+        </h2>
+    </section>
+
+    <section class="service-container">
+        
+        <div class="svc-header">
+            <span class="svc-header-label">Main Service</span>
+            <h2 class="svc-header-title">
+                그 날의 독서를<br>
+                북로그에 기록해 보세요.
+            </h2>
+        </div>
+
+        <div class="feature-row reveal">
+            <div class="feature-text">
+                <span class="feature-label">독서 기록</span>
+                <h3 class="feature-title">
+                    독서한 날마다<br>
+                    페이지를 기록하고<br>
+                    인상 깊은 문구와 생각을 정리해요.
+                </h3>
+                <p class="feature-desc">
+                    하나 하나 기록하다 보면<br>
+                    어느덧 독서 완료가 코 앞에!<br>
+                    마지막 페이지를 읽을 때쯤 완성된 기록장을 바라보세요.
+                </p>
+            </div>
+            <div class="feature-card">
+                <img src="login_v1.jpg" alt="독서 기록 화면" class="feature-img">
+            </div>
+        </div>
+
+        <div class="feature-row reverse reveal">
+            <div class="feature-text">
+                <span class="feature-label">독서 복기</span>
+                <h3 class="feature-title">
+                    독서 기록들을 한눈에<br>
+                    바라보세요<br>
+                </h3>
+                <p class="feature-desc">
+                    기록들을 한눈에 바라보며<br>
+                    독서했던 날들의 추억들을<br>
+                    떠올려보세요.<br>
+                </p>
+            </div>
+            <div class="feature-card">
+                <img src="record_v1.jpg" alt="독서 기록 화면" class="feature-img">
+            </div>
+        </div>
+
+        <div class="feature-row reveal">
+            <div class="feature-text">
+                <span class="feature-label">AI 토론 서비스</span>
+                <h3 class="feature-title">
+                    독서를 끝마쳤다면<br>
+                    AI와의 토론을 통해<br>
+                    나만의 독서를 깊이있게
+                </h3>
+                <p class="feature-desc">
+                    Gemini 3 api가 여러분의 기록을 기억합니다.<br>
+                    정리한 내 생각과 문구들을 토대로<br>
+                    깊이 있는 토론을 진행할 수 있어요.
+                </p>
+            </div>
+            <div class="feature-card">
+                <img src="ai_talk_v1.jpg" alt="독서 기록 화면" class="feature-img">
+            </div>
+        </div>
+
+    </section>
+    <script>
+        // 1. 로그아웃 함수
+        async function logout() {
+            try {
+                // 서버 쿠키 삭제 요청 (옵션)
+                // await fetch('/logout', { method: 'POST' }); 
+                
+                localStorage.removeItem('myToken');
+                alert("로그아웃 되었습니다.");
+                window.location.reload();
+            } catch (e) {
+                console.error(e);
+                window.location.reload();
+            }
+        }
+
+        // 2. 유저 정보 로드 (토큰 재발급 로직 포함)
+        async function loadUserInfo() {
+            const token = localStorage.getItem('myToken');
+            const authArea = document.getElementById('auth-area');
+
+            // --- CASE A: 토큰 있음 (회원) ---
+            if (token) {
+                try {
+                    const response = await fetch('/get-user-info', {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    // 토큰 만료 시 재발급 시도
+                    if (response.status === 403 || response.status === 401) {
+                        console.log("토큰 만료, 재발급 시도...");
+                        localStorage.removeItem('myToken');
+
+                        // 쿠키(Refresh Token)를 자동으로 전송하기 위해 credentials: 'include' 필수 아님(같은 도메인이면 기본 전송되나 명시 권장)
+                        // 단, fetch API 기본 동작상 같은 도메인은 쿠키가 감.
+                        const refreshResponse = await fetch('/refresh'); 
+                        
+                        if (refreshResponse.ok) {
+                            const refreshResult = await refreshResponse.json();
+                            if(refreshResult.success) {
+                                localStorage.setItem('myToken', refreshResult.token);
+                                return loadUserInfo(); // 재귀 호출
+                            }
+                        }
+                        
+                        // 재발급 실패
+                        alert("세션이 만료되었습니다.");
+                        window.location.href = '/login.html';
+                        return;
+                    }
+
+                    const result = await response.json();
+                    updateUI(result.user, result.message, true);
+
+                } catch (error) {
+                    console.error(error);
+                }
+
+            // --- CASE B: 토큰 없음 (게스트) ---
+            } else {
+                try {
+                    const response = await fetch('/guest-entry');
+                    const result = await response.json();
+                    updateUI(result.user, result.message, false);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        }
+
+        // 3. UI 업데이트 함수
+        function updateUI(user, message, isMember) {
+            const displayMsg = document.getElementById('display_msg');
+            const userDetails = document.getElementById('user_details');
+            const btnLogin = document.getElementById('btn_login');
+            const btnLogout = document.getElementById('btn_logout');
+
+            if (user) {
+                // 네비게이션 바 메시지
+                displayMsg.style.display = 'inline-block';
+                displayMsg.innerText = isMember ? `${user.name}님` : 'Guest 모드';
+                
+                // 중앙 하단 상세 정보
+                userDetails.innerText = `ID: ${user.id} | Name: ${user.name}`;
+
+                // 버튼 상태 변경
+                if (isMember) {
+                    btnLogin.style.display = 'none';
+                    btnLogout.style.display = 'inline-block';
+                } else {
+                    btnLogin.style.display = 'inline-block';
+                    btnLogout.style.display = 'none';
+                    // 게스트일 경우 버튼 텍스트 변경
+                    btnLogin.innerText = "로그인";
+                }
+            }
+        }
+
+        // 4. 스크롤 애니메이션 관찰자 설정
+        function initScrollAnimation() {
+            const observerOptions = {
+                threshold: 0.2 // 요소가 화면의 20% 정도 보였을 때 실행
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // 화면에 노출되면 active 클래스 추가
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            // .reveal 클래스를 가진 모든 요소를 관찰 대상으로 등록
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+        }
+
+        // window.onload에 함수 추가
+        const originOnload = window.onload;
+        window.onload = function() {
+            if(originOnload) originOnload(); // 기존 유저 정보 로드 함수 실행
+            initScrollAnimation();      // 애니메이션 초기화 실행
+            loadUserInfo();
+        };
+
+    </script>
+</body>
+</html>

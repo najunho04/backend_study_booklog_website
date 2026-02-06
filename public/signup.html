@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookLog - 회원가입</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* [1] 배경 및 기본 폰트 (login.html과 동일) */
+        body {
+            font-family: 'Poppins', 'Noto Sans KR', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* 가로 모드 및 모바일 대응을 위해 min-height 사용 */
+            background: linear-gradient(135deg, #CBBBA0 0%, #F3EFEA 100%);
+            padding: 20px; /* 모바일 여백 */
+        }
+
+        /* [2] 회원가입 컨테이너 디자인 */
+        .signup-container {
+            background-color: white;
+            padding: 2.5rem 3rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .signup-container h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #CBBBA0;
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-container p.subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 2rem;
+        }
+
+        /* [3] 입력 필드 스타일 */
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #CBBBA0;
+            box-shadow: 0 0 8px rgba(203, 187, 160, 0.2);
+        }
+
+        /* [4] 버튼 스타일 (Pill 스타일 계승) */
+        .btn-signup {
+            width: 100%;
+            padding: 14px;
+            background-color: #CBBBA0;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(203, 187, 160, 0.4);
+        }
+
+        /* [5] 로그인 페이지 이동 링크 */
+        .login-link {
+            margin-top: 1.5rem;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .btn-login-page {
+            display: inline-block;
+            margin-top: 5px;
+            color: #CBBBA0;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .btn-login-page:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 18px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+    <h2>BookLog</h2>
+    <p class="subtitle">나만의 독서 기록장을 시작해보세요</p>
+    
+    <div class="input-group">
+        <label for="user_name">이름</label>
+        <input type="text" id="user_name" placeholder="실명을 입력하세요" required>
+    </div>
+
+    <div class="input-group">
+        <label for="user_id">아이디</label>
+        <input type="text" id="user_id" placeholder="사용할 ID를 입력하세요" required>
+    </div>
+
+    <div class="input-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" placeholder="8자 이상 입력하세요" required>
+    </div>
+
+    <div class="input-group">
+        <label for="password_confirm">비밀번호 확인</label>
+        <input type="password" id="password_confirm" placeholder="비밀번호를 한번 더 입력하세요" required>
+    </div>
+
+    <button class="btn-signup" onclick="handleSignup()">회원가입 하기</button>
+    
+    <p id="message"></p>
+
+    <div class="login-link">
+        이미 계정이 있으신가요? <br>
+        <a href="/login.html" class="btn-login-page">로그인 하러가기</a>
+    </div>
+</div>
+
+<script>
+    async function handleSignup() {
+        const name = document.getElementById('user_name').value;
+        const user_id = document.getElementById('user_id').value;
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('password_confirm').value;
+        const messageElement = document.getElementById('message');
+
+        // 기본 유효성 검사 (Java의 Validation 로직과 유사)
+        if(!name || !user_id || !password || !passwordConfirm) {
+            messageElement.style.color = '#e74c3c';
+            messageElement.innerText = '모든 필드를 입력해주세요.';
+            return;
+        }
+
+        if(password !== passwordConfirm) {
+            messageElement.style.color = '#e74c3c';
+            messageElement.innerText = '비밀번호가 일치하지 않습니다.';
+            return;
+        }
+
+        try {
+            const response = await fetch('/signup', { // 백엔드 API 엔드포인트에 맞게 수정 가능
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, user_id, password })
+            });
+
+            console.log("response", "response...");
+
+            const result = await response.json();
+
+            console.log("result", "result success...");
+
+            if (result.success) {
+                messageElement.style.color = '#2ecc71'; // 성공 시 초록색
+                messageElement.innerText = '회원가입 성공! 로그인 페이지로 이동합니다.';
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 1500);
+            } else {
+                messageElement.style.color = '#e74c3c';
+                messageElement.innerText = result.message || '이미 존재하는 아이디이거나 가입에 실패했습니다.';
+            }
+        } catch (err) {
+            console.error('회원가입 에러:', err);
+            messageElement.style.color = '#e74c3c';
+            messageElement.innerText = '서버 통신 중 에러가 발생했습니다.';
+        }
+    }
+</script>
+
+</body>
+</html>

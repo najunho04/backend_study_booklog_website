@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookLog - 다운로드 신청</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* [2] 배경 및 기본 폰트 (이전 페이지들과 동일) */
+        body {
+            font-family: 'Poppins', 'Noto Sans KR', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #CBBBA0 0%, #F3EFEA 100%);
+        }
+
+        /* [3] 컨테이너 디자인 */
+        .download-container {
+            background-color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .download-container h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #CBBBA0;
+            margin-bottom: 1rem;
+        }
+
+        /* [4] 상태 안내 문구 */
+        .status-badge {
+            display: inline-block;
+            background-color: rgba(203, 187, 160, 0.1);
+            color: #CBBBA0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .description {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* [5] 입력 필드 스타일 */
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #CBBBA0;
+        }
+
+        /* [6] 신청 버튼 (Pill 스타일) */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: #CBBBA0;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(203, 187, 160, 0.4);
+        }
+
+        /* [7] 하단 링크 */
+        .back-link {
+            margin-top: 2rem;
+            font-size: 14px;
+        }
+
+        .back-link a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link a:hover {
+            color: #CBBBA0;
+            text-decoration: underline;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="download-container">
+    <div class="status-badge">Google Play 비공개 테스트 중</div>
+    <h2>BookLog 앱 다운로드</h2>
+    
+    <p class="description">
+        현재 더 나은 서비스를 위해 비공개 테스트를 진행 중입니다.<br>
+        <strong>이메일을 남겨주시면</strong> 테스트 참여 링크와<br>
+        정식 출시 알림을 가장 먼저 보내드릴게요!
+    </p>
+
+    <div class="input-group">
+        <label for="user_email">알림 받을 이메일 주소</label>
+        <input type="email" id="user_email" placeholder="example@email.com" required>
+    </div>
+
+    <button class="btn-submit" onclick="handleDownloadRequest()">신청 링크 받기</button>
+    
+    <p id="message"></p>
+
+    <div class="back-link">
+        <a href="/bookLog.html">← 메인 페이지로 돌아가기</a>
+    </div>
+</div>
+
+<script>
+    async function handleDownloadRequest() {
+        const email = document.getElementById('user_email').value;
+        const messageElement = document.getElementById('message');
+
+        // 이메일 형식 체크 (Java의 Regex 검증과 유사)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!email || !emailRegex.test(email)) {
+            messageElement.style.color = '#e74c3c';
+            messageElement.innerText = '올바른 이메일 주소를 입력해주세요.';
+            return;
+        }
+
+        //DB 호출을 위한 JWT
+        const token = localStorage.getItem('myToken');
+        if(!token) {
+            alert("로그인이 필요한 서비스입니다.");
+            window.location.href = '/login.html';
+            return;
+        }
+
+        try {
+            // 서버에 이메일 저장 요청 (엔드포인트는 임의 설정)
+            const response = await fetch('/request-download', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}` // 토큰은 헤더에!
+                },
+                body: JSON.stringify({ email }) // 바디에는 데이터만!
+            });
+
+            // 토큰 만료 처리 -> RefreshToken 확인 후 JWT 재발급
+            if (response.status === 403 || response.status === 401) {
+                console.log("Access Token 만료. 재발급 시도...");
+
+                localStorage.removeItem('myToken'); // 만료된 토큰 삭제
+                        
+                alert("세션이 만료되어 재확인 중입니다.");
+
+                //이미 헤더에 RefreshToken 있음. 파라미터 필요 X
+                const refreshResponse = await fetch('/refresh');
+                const refreshResult = await refreshResponse.json();
+                if(refreshResult.success) {
+                localStorage.setItem('myToken', refreshResult.token);
+
+                console.log("토큰 재발급",  refreshResult.token);
+
+                return handleDownloadRequest(); // 재귀 호출하여 JWT 재인증
+                }else{
+                    // 재발급 실패 시 (리프레시 토큰도 만료됨)
+                    alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+                    window.location.href = '/login.html';
+                    return; // 함수 종료
+                }
+            }
+
+            if(response.status == 400){
+                console.error("no email", "이메일이 누락되었습니다.");
+                window.location.href = '/main.html';
+            }
+
+            if(response.status == 404){
+                console.error("no email", "DB에 맞는 유저가 없습니다.");
+                window.location.href = '/main.html';
+            }
+
+            const result = await response.json();
+            if(result.success){
+                // 실제 서버 연동 전 시뮬레이션
+                messageElement.style.color = '#CBBBA0';
+                messageElement.innerText = result.message;
+                document.getElementById('user_email').value = ''; // 입력창 초기화
+            }
+
+        } catch (err) {
+            console.error('신청 에러:', err);
+            messageElement.style.color = '#e74c3c';
+            messageElement.innerText = '서버 통신 중 에러가 발생했습니다.';
+        }
+    }
+</script>
+
+</body>
+</html>
