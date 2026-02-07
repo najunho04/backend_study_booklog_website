@@ -265,51 +265,109 @@
         
         /* 반응형: 모바일 (768px 이하) */
     @media (max-width: 768px) {
-        /* 1. 컨테이너 여백 확보: 텍스트가 화면 끝에 붙지 않게 함 */
+        
+        /* [수정 1] 배경 이슈 해결: Body 패딩 제거 */
         body {
-            padding: 0 20px; 
-        overflow-x: hidden; /* 가로 스크롤 방지 */
+            padding: 0; /* 배경이 화면 끝까지 꽉 차게 변경 */
+            overflow-x: hidden;
         }
 
-            /* 2. 로우 설정: 세로 정렬 및 간격 최적화 */
+        /* [수정 2] 헤더(상단 메뉴) 레이아웃 정리 */
+        header {
+            padding: 15px 20px; /* 모바일에 맞게 여백 축소 */
+            flex-direction: row; /* 가로 정렬 유지 */
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 18px; /* 로고 크기 약간 축소 */
+            z-index: 20; /* 겹침 방지 */
+        }
+
+        .logo-img {
+            height: 30px; /* 로고 이미지 크기 조절 */
+        }
+
+        /* 모바일에서는 공간이 좁으므로 텍스트 메뉴(메인, 서비스 등) 숨김 처리 */
+        .nav-menu {
+            gap: 10px;
+        }
+
+        .nav-menu li a {
+            display: none; /* 모두 숨김 */
+        }
+
+        /* 로그인/게스트 정보 영역만 보이게 설정 */
+        .nav-menu li#auth-area {
+            display: flex;
+        }
+
+        /* 버튼 및 유저 정보 폰트 사이즈 조절 */
+        .btn-white-pill {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        .user-info-display {
+            font-size: 11px;
+            padding: 4px 10px;
+            max-width: 120px; /* 이름이 길 경우 말줄임 등을 위해 제한 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* [수정 3] 컨텐츠 여백 이동 (Body에서 여기로 이동) */
+        .content-wrapper {
+            padding: 0 20px; /* 텍스트가 화면 끝에 붙지 않도록 여기에 패딩 추가 */
+            margin-top: 60px; /* 헤더와의 간격 조정 */
+        }
+
+        /* 기존 스타일 유지 */
         .feature-row, .feature-row.reverse {
-            flex-direction: column !important; /* 강제 세로 정렬 */
-            align-items: center; /* 자식 요소들을 가로 중앙으로 */
+            flex-direction: column !important;
+            align-items: center;
             text-align: center;
-            gap: 40px; /* 요소 사이의 충분한 거리 */
-         margin-bottom: 100px;
+            gap: 40px;
+            margin-bottom: 100px;
         }
 
-        /* 3. 텍스트 영역: 너비를 100%로 하고 가독성 높이기 */
         .feature-text {
             width: 100%;
             text-align: center; 
-            order: 2; /* 이미지가 먼저 나오고 글이 나중에 나오게 순서 조정 가능 */
+            order: 2;
+            padding: 0 20px; /* 텍스트 좌우 여백 */
         }
 
-        /* 4. 카드/이미지 영역: 고정 높이 제거가 핵심! */
         .feature-card {
             width: 100%;
-            max-width: 450px; /* 너무 커지는 것 방지 */
-            height: auto;     /* 고정 높이(300px) 대신 내용에 맞게 조절 */
-            aspect-ratio: 4 / 3; /* 직사각형 비율 유지 (선택 사항) */
+            max-width: 450px;
+            height: auto;
+            aspect-ratio: 4 / 3;
             margin: 0 auto;
             order: 1;
         }
 
-        /* 5. 폰트 크기: 모바일 화면에 맞게 최적화 */
         .main-title { 
-            font-size: 32px; /* 40px은 모바일에서 여전히 클 수 있음 */
+            font-size: 36px; /* 폰트 사이즈 모바일 최적화 */
             line-height: 1.2; 
-            word-break: keep-all; /* 한글 단어가 어색하게 잘리지 않게 함 */
+            word-break: keep-all;
         }
         .svc-header-title { font-size: 28px; }
         .feature-title { font-size: 24px; }
     
-        /* 6. 이미지 설정: 이미지가 부모보다 커지지 않게 */
         img {
             max-width: 100%;
             height: auto;
+        }
+        
+        /* 폰 목업 크기 조절 */
+        .phone-mockup {
+            width: 80%; /* 화면 너비의 80% 사용 */
+            height: auto; /* 높이 자동 */
+            aspect-ratio: 1 / 2; /* 비율 유지 */
+            margin: 40px auto 0;
+            border-width: 8px; /* 베젤 두께 축소 */
         }
     }
 
@@ -317,7 +375,7 @@
         .reveal {
             opacity: 0;
             transform: translateX(-50px); /* 왼쪽으로 50px 이동된 상태 */
-            transition: all 0.8s ease-out; /* 0.8초 동안 부드럽게 재생 */
+            transition: all 0.5s ease-out; /* 0.8초 동안 부드럽게 재생 */
         }
 
         /* 스크롤 감지 시 붙여줄 클래스 */
@@ -346,7 +404,7 @@
                 <ul class="nav-menu">
                     <li><a href='/bookLog.html'>메인</a></li>
                     <li><a href="#about">서비스</a></li>
-                    <li><a href='/download.html'>다운로드</a></li>
+                    <li><a href='/download.html' class="download-link">다운로드</a></li>
                     
                     <li id="auth-area" style="display: flex; align-items: center;">
                         <span id="display_msg" class="user-info-display" style="display:none;"></span>
@@ -372,7 +430,7 @@
             
             <p id="user_details" style="font-size: 14px; opacity: 0.8; margin-bottom: 20px; min-height: 20px;"></p>
 
-            <button class="btn-outline" onclick="location.href='/main.html'">앱 다운로드 바로가기</button>
+            <button class="btn-outline" onclick="location.href='/download.html'">앱 다운로드 바로가기</button>
 
             <div class="phone-mockup">
                 <div style="text-align: center;">
