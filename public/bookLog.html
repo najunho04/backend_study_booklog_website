@@ -263,22 +263,55 @@
             border-radius: 30px; /* 부모인 feature-card의 곡률과 맞춤 */
         }
         
-        /* 반응형: 모바일에서는 세로로 정렬 */
-        @media (max-width: 768px) {
-            .feature-row, .feature-row.reverse {
-                flex-direction: column;
-                text-align: center;
-                gap: 30px;
-                margin-bottom: 80px;
-            }
-            .feature-text {
-                text-align: center; /* 모바일은 중앙 정렬 */
-            }
-            .main-title { font-size: 40px; }
-            .svc-header-title { font-size: 32px; }
-            .feature-title { font-size: 28px; }
-            .feature-card { width: 100%; height: 300px; }
+        /* 반응형: 모바일 (768px 이하) */
+    @media (max-width: 768px) {
+        /* 1. 컨테이너 여백 확보: 텍스트가 화면 끝에 붙지 않게 함 */
+        body {
+            padding: 0 20px; 
+        overflow-x: hidden; /* 가로 스크롤 방지 */
         }
+
+            /* 2. 로우 설정: 세로 정렬 및 간격 최적화 */
+        .feature-row, .feature-row.reverse {
+            flex-direction: column !important; /* 강제 세로 정렬 */
+            align-items: center; /* 자식 요소들을 가로 중앙으로 */
+            text-align: center;
+            gap: 40px; /* 요소 사이의 충분한 거리 */
+         margin-bottom: 100px;
+        }
+
+        /* 3. 텍스트 영역: 너비를 100%로 하고 가독성 높이기 */
+        .feature-text {
+            width: 100%;
+            text-align: center; 
+            order: 2; /* 이미지가 먼저 나오고 글이 나중에 나오게 순서 조정 가능 */
+        }
+
+        /* 4. 카드/이미지 영역: 고정 높이 제거가 핵심! */
+        .feature-card {
+            width: 100%;
+            max-width: 450px; /* 너무 커지는 것 방지 */
+            height: auto;     /* 고정 높이(300px) 대신 내용에 맞게 조절 */
+            aspect-ratio: 4 / 3; /* 직사각형 비율 유지 (선택 사항) */
+            margin: 0 auto;
+            order: 1;
+        }
+
+        /* 5. 폰트 크기: 모바일 화면에 맞게 최적화 */
+        .main-title { 
+            font-size: 32px; /* 40px은 모바일에서 여전히 클 수 있음 */
+            line-height: 1.2; 
+            word-break: keep-all; /* 한글 단어가 어색하게 잘리지 않게 함 */
+        }
+        .svc-header-title { font-size: 28px; }
+        .feature-title { font-size: 24px; }
+    
+        /* 6. 이미지 설정: 이미지가 부모보다 커지지 않게 */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    }
 
         /* [8] 애니메이션 스타일 */
         .reveal {
